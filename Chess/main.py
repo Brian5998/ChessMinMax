@@ -1,4 +1,9 @@
 from Chess import ChessMain
-
-#ChessMain.main(False,True)
-ChessMain.main(True,False)
+'''
+False = AI
+True = Human
+White,Black,Depth
+'''
+#ChessMain.main(False,True,3)
+#ChessMain.main(True,False,1)
+ChessMain.main(False,False,3)

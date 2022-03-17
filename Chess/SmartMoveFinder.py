@@ -93,40 +93,7 @@ DEPTH = 3
 def findRandomMove(validMoves):
     return random.choice(validMoves)
 
-'''find best move based on materials minmaxwithout recursion'''
-def findBestMoveMinMaxNoRecursion(gs, validMoves):
 
-    turnMultiplier = 1 if gs.whiteToMove else -1
-    opponentMinMaxScore = CHECKMATE
-    bestPlayerMove = None
-    random.shuffle(validMoves)
-    for playerMove in validMoves:
-        gs.makeMove(playerMove)
-        opponentsMoves = gs.getValidMoves()
-        if gs.stalemate:
-            opponentMaxScore = 0
-        elif gs.checkmate:
-            opponentMaxScore = -CHECKMATE
-        else:
-            opponentMaxScore = -CHECKMATE
-            for opponentsMove in opponentsMoves:
-                gs.makeMove(opponentsMove)
-                gs.getValidMoves
-                if gs.checkmate:
-                    score = -turnMultiplier * CHECKMATE
-                elif gs.stalemate:
-                    score = STALEMATE
-                else:
-                    score = -turnMultiplier * scoreMaterial(gs.board)
-                if (score > opponentMaxScore):
-                    opponentMaxScore = score
-                gs.undoMove()
-        if opponentMaxScore < opponentMinMaxScore:
-            opponentMinMaxScore = opponentMaxScore
-            bestPlayerMove = playerMove
-        gs.undoMove()
-
-    return bestPlayerMove
 
 '''positive score good for white, negative good for black'''
 def scoreBoard(gs):
@@ -146,7 +113,7 @@ def scoreBoard(gs):
                 #score it positionally
                 piecePositionScore = 0
                 if square[1] == 'p' or square[1] == 'K':  # pawns or kings
-                    if isEndgame(gs,gs.board) and square[1] == 'K':
+                    if isEndgame(gs.board) and square[1] == 'K':
                         piecePositionScore = piecePositionScores[square[1]][row][col]
                     else:
                         piecePositionScore = piecePositionScores[square][row][col]
@@ -159,67 +126,18 @@ def scoreBoard(gs):
 
     return score
 
-def findBestMove(gs,validMoves):
+def findBestMove(gs,validMoves,depth):
     global nextMove,counter
     nextMove = None
     random.shuffle(validMoves)
     bestGuesses= orderMoves(gs, validMoves)
     counter = 0
-    #findMoveMinMax(gs, validMoves,DEPTH, gs.whiteToMove)
-    #findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
-    #findMoveNegaMaxAlphaBeta(gs, validMoves,DEPTH,-CHECKMATE,CHECKMATE, 1 if gs.whiteToMove else -1)
-    findMoveNegaMaxAlphaBeta(gs, bestGuesses, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
+    findMoveMinMaxAlphaBeta(gs, bestGuesses, depth, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
     print(counter)
     return nextMove
 
-def findMoveMinMax(gs, validMoves, depth, whiteToMove):
-    global nextMove
-    if depth == 0:
-        return scoreMaterial(gs.board)
-    if whiteToMove:
-        maxScore = -CHECKMATE
-        for move in validMoves:
-            gs.makeMove(move)
-            nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs,nextMoves, depth -1, False)
-            if score > maxScore:
-                maxScore = score
-                if depth == DEPTH:
-                    nextMove = move
-            gs.undoMove()
-        return maxScore
-    else:
-        minScore = CHECKMATE
-        for move in validMoves:
-            gs.makeMove(move)
-            nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth-1, True)
-            if score < minScore:
-                minScore = score
-                if depth == DEPTH:
-                    nextMove = move
-            gs.undoMove()
-        return minScore
 
-
-def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
-    global nextMove, counter
-    counter += 1
-    if depth == 0:
-        return turnMultiplier * scoreBoard(gs)
-    maxScore = -CHECKMATE
-    for move in validMoves:
-        gs.makeMove(move)
-        nextMoves = gs.getValidMoves()
-        score = -findMoveNegaMax(gs,nextMoves,depth-1,-turnMultiplier)
-        if score > maxScore:
-            maxScore = score
-            if depth == DEPTH:
-                nextMove = move
-        gs.undoMove()
-    return maxScore
-
-def findMoveNegaMaxAlphaBeta(gs, allValidMoves, depth, alpha, beta, turnMultiplier):
+def findMoveMinMaxAlphaBeta(gs, allValidMoves, depth, alpha, beta, turnMultiplier):
     global nextMove,counter
     counter +=1
     if depth == 0:
@@ -230,7 +148,7 @@ def findMoveNegaMaxAlphaBeta(gs, allValidMoves, depth, alpha, beta, turnMultipli
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
         random.shuffle(nextMoves)
-        score = -findMoveNegaMaxAlphaBeta(gs,orderMoves(gs,nextMoves),depth-1,-beta,-alpha,-turnMultiplier)
+        score = -findMoveMinMaxAlphaBeta(gs,orderMoves(gs,nextMoves),depth-1,-beta,-alpha,-turnMultiplier)
         if score > maxScore:
             maxScore = score
             if depth == DEPTH:
@@ -264,7 +182,7 @@ def orderMoves(gs,validMoves):
             bestGuessedMoves.append(move)
     return bestGuessedMoves
 
-def isEndgame(gs, board):
+def isEndgame(board):
     whiteScore = 0
     blackScore = 0
 
@@ -274,19 +192,7 @@ def isEndgame(gs, board):
                 whiteScore += pieceScore[square[1]]
             if square[0] == 'b':
                 blackScore += pieceScore[square[1]]
-    #if len(gs.moveLog) > 30 and whiteScore < 11 or blackScore < 11:
     if whiteScore < 11 or blackScore < 11:
         return True
     else:
         return False
-
-def scoreMaterial(board):
-    score = 0;
-    for row in board:
-        for square in row:
-            if square[0] == 'w':
-                score += pieceScore[square[1]]
-            elif square[0] == 'b':
-                score -= pieceScore[square[1]]
-
-    return score

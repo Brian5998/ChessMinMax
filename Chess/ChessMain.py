@@ -15,7 +15,7 @@ def loadImages():
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (64, 64))
 
-def main(p1,p2):
+def main(p1,p2,depth):
     p.init()
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT))
     clock = p.time.Clock()
@@ -82,7 +82,7 @@ def main(p1,p2):
 
         #AI move finder logic
         if not gameOver and not humanTurn:
-            AIMove = SmartMoveFinder.findBestMove(gs,validMoves)
+            AIMove = SmartMoveFinder.findBestMove(gs,validMoves,depth)
             if AIMove is None:
                 AIMove = SmartMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
