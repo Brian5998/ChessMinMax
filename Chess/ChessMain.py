@@ -80,6 +80,7 @@ def main(p1,p2,depth):
                     gs.whiteToMove = True
 
 
+
         #AI move finder logic
         if not gameOver and not humanTurn:
             AIMove = SmartMoveFinder.findBestMove(gs,validMoves,depth)

@@ -196,3 +196,4 @@ def isEndgame(board):
         return True
     else:
         return False
+
