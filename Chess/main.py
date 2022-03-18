@@ -1,5 +1,8 @@
 from Chess import ChessMain
 '''
+Code referenced from Eddie Sharick: https://www.youtube.com/watch?v=EnYui0e73Rs
+
+I added optimizations to make it better
 False = AI
 True = Human
 White,Black,Depth
